@@ -1,13 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + Vue</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>Todo App with VueJS</title>
+</head>
+<body>
+<div id="app" class="vh-100 d-flex justify-content-center align-items-center" style="background-color: #3da2c3;">
+    <div class="card rounded-3 p-4" style="width: 400px;">
+        <h2 class="mb-3">Task List</h2>
+        
+        <task-list :tasks="tasks" @remove-task="removeTask"></task-list>
+        
+        <task-input @add-task="addTask"></task-input>
+    </div>
+</div>
+
+<script>
+    const TaskList = {
+        props: ['tasks'],
+        template: `
+            <ul class="list-group mb-3">
+                <li v-for="(task, index) in tasks" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ task }}</span>
+                    <button class="btn btn-danger btn-sm" @click="$emit('remove-task', index)">×</button>
+                </li>
+            </ul>
+        `
+    };
+
+    const TaskInput = {
+        data() {
+            return { newTask: '' };
+        },
+        template: `
+            <div class="input-group">
+                <input v-model="newTask" type="text" class="form-control" placeholder="New Task">
+                <button class="btn btn-primary" @click="submitTask">Add</button>
+            </div>
+        `,
+        methods: {
+            submitTask() {
+                if (this.newTask.trim() !== '') {
+                    this.$emit('add-task', this.newTask.trim());
+                    this.newTask = '';
+                }
+            }
+        }
+    };
+
+    const app = Vue.createApp({
+        components: { TaskList, TaskInput },
+        data() {
+            return {
+                tasks: ['Task 1', 'Task 2', 'Task 3']
+            };
+        },
+        methods: {
+            addTask(task) {
+                this.tasks.push(task);
+            },
+            removeTask(index) {
+                this.tasks.splice(index, 1);
+            }
+        }
+    });
+    
+    app.mount('#app');
+</script>
+</body>
 </html>
